@@ -94,5 +94,25 @@ module Stripe
         assert plan.is_a?(Stripe::Plan)
       end
     end
+
+    context "decimal strings" do
+      should "deserialize as a string" do
+        plan = Stripe::Plan.construct_from(JSON.parse("{\"amount_precise\": \"0.000000123\"}", symbolize_names: true))
+        assert_equal "0.000000123", plan.amount_precise
+        assert plan.amount_precise.is_a?(String)
+      end
+
+      should "deserialize as a BigDecimal" do
+        class PlanWithAccessor < Stripe::Plan
+          def amount_precise
+            p "hello!!!!!!!!!"
+            @amount_precise ||= BigDecimal(@values[:amount_precise])
+          end
+        end
+        plan = PlanWithAccessor.construct_from(JSON.parse("{\"amount_precise\": \"0.000000123\"}", symbolize_names: true))
+        assert_equal "0.000000123", plan.amount_precise
+        assert plan.amount_precise.is_a?(BigDecimal)
+      end
+    end
   end
 end

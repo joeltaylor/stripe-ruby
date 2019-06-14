@@ -38,6 +38,18 @@ module Stripe
       )
     end
 
+    should "#encode_parameters should encode decimal strings" do
+      params = {
+        float: 0.000000123,
+        string: "0.000000123",
+        decimal: BigDecimal("0.000000123"),
+      }
+      assert_equal(
+        "float=0.000000123&string=0.000000123&decimal=0.000000123",
+        Stripe::Util.encode_parameters(params)
+      )
+    end
+
     should "#url_encode should prepare strings for HTTP" do
       assert_equal "foo",      Stripe::Util.url_encode("foo")
       assert_equal "foo",      Stripe::Util.url_encode(:foo)
